@@ -8,29 +8,32 @@ object task1 {
 
   trait Building
 
-  object UserPhone {
-    def apply(phone: String): Option[String] = {
-      val regex = raw"\+79\d{9}".r
-      if (regex.matches(phone)) Some(phone) else None
+  sealed trait HouseType
+  case object Premium extends HouseType
+  case object Economy extends HouseType
+
+  case class House(houseType: HouseType, floors: Int, length: Double, width: Double, height: Double) {
+    require(floors > 0 && length > 0 && width > 0 && height > 0, "Invalid house parameters")
+
+    def calculateParquetCost: Double = houseType match {
+      case Premium if floors < 5 => Math.pow(3, floors) * (length + width + height)
+      case Premium => Math.pow(2, floors) * (length + width + height)
+      case Economy => length * width * height + floors * 10000
     }
   }
 
   def main(args: Array[String]): Unit = {
-    val validRussianPhone = "+79123456789"
-    val invalidRussianPhone = "+78123456789"
-    val invalidPhone = "1234567890"
+    // Создаем экземпляры домов
+    val premiumHouse = House(Premium, 4, 10, 5, 3)
+    val economyHouse = House(Economy, 2, 8, 6, 2)
 
-    val validRussianPhoneResult = UserPhone(validRussianPhone)
-    val invalidRussianPhoneResult = UserPhone(invalidRussianPhone)
-    val invalidPhoneResult = UserPhone(invalidPhone)
+    // Рассчитываем стоимость паркета для каждого дома
+    val premiumParquetCost = premiumHouse.calculateParquetCost
+    val economyParquetCost = economyHouse.calculateParquetCost
 
-    println(s"Valid Russian phone: $validRussianPhone -> $validRussianPhoneResult")
-    println(s"Invalid Russian phone: $invalidRussianPhone -> $invalidRussianPhoneResult")
-    println(s"Invalid phone: $invalidPhone -> $invalidPhoneResult")
+    // Выводим результаты
+    println(s"Premium house parquet cost: $premiumParquetCost")
+    println(s"Economy house parquet cost: $economyParquetCost")
 
-    // Проверка на тестовые случаи
-    assert(UserPhone("+79123456789") == Some("+79123456789"))
-    assert(UserPhone("+78123456789") == None)
-    assert(UserPhone("1234567890") == None)
   }
 }
