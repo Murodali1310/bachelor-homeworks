@@ -26,7 +26,6 @@ class task2Spec extends AnyFunSpec with Matchers {
         UserId(id).nonEmpty shouldBe isValid
       }
 
-
     testCase(2288, isValid = true)
     testCase(666, isValid = true)
     testCase(0, isValid = true)
