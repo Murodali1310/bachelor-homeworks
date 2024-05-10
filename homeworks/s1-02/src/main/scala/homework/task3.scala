@@ -59,12 +59,17 @@ object task3 {
     }
   task"определите эквивалентность двух экпонент высшего порядка булевых типов (2 ^ 2) ^ 2 = 2 ^ (2 ^ 2)"
 
-  def boolToBoolToBool: Equivalent[Boolean => Boolean => Boolean, (Boolean => Boolean) => Boolean] = ???
+  def boolToBoolToBool: Equivalent[Boolean => Boolean => Boolean, (Boolean => Boolean) => Boolean] =
+    Equivalent {
+      (f: Boolean => Boolean => Boolean) => g: (Boolean => Boolean) => f(g(true))(g(false))
+    } {
+      (f: (Boolean => Boolean) => Boolean) => a: Boolean => b: Boolean => f(c => if(c) a else b)
+    }
 
   task"докажите тривиальное качество терминального типа Unit 1 ^ A = 1"
   def AToUnit[A]: Equivalent[A => Unit, Unit] =
     Equivalent {
-      (f: A => Unit) => ()
+      (_: A => Unit) => ()
     } {
       (_: Unit) => (_: A) => ()
     }
