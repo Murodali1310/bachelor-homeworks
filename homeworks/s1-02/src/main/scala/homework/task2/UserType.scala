@@ -1,6 +1,5 @@
 package homework.task2
 
-
 sealed trait UserType
 
 object UserType {

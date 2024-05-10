@@ -5,29 +5,42 @@ trait UserSettingsService {
 }
 
 object UserSettingsService {
+  def apply(userService: UserService): UserSettingsService = new UserSettingsService {
+    def productType(phone: UserPhone): Int = {
+      userService.findUserProducts(phone) match {
+        case Some(product) =>
+          product match {
+            case UserProducts.LightProducts => 0
+            case _                          => 1
+          }
+        case None => 1
+      }
+    }
 
-  def apply(userService: UserService): UserSettingsService = (userId: UserId) => {
-    val passwordInfo  = userService.getPasswordInfo(userId)
-    val isPasswordSet = passwordInfo.sent || !passwordInfo.temporary
-    userService.findUser(userId) match {
-      case Some(user) =>
-        user.`type` match {
-          case UserType.Dummy => Some(PasswordSettings(set = false, allowed = false))
-          case UserType.Customer =>
-            Some(PasswordSettings(allowed = true, set = isPasswordSet))
-          case UserType.AlmostCustomer =>
-            user.phone match {
-              case Some(phone) =>
-                userService.findUserProducts(phone) match {
-                  case Some(UserProducts.HeavyProducts) => Some(PasswordSettings(allowed = true, set = isPasswordSet))
-                  case Some(UserProducts.LightProducts) =>
-                    Some(PasswordSettings(allowed = isPasswordSet, set = isPasswordSet))
-                  case None => Some(PasswordSettings(allowed = true, set = isPasswordSet))
-                }
-              case _ => None
-            }
-        }
-      case _ => None
+    override def getPasswordSettings(userId: UserId): Option[PasswordSettings] = {
+      val user: Option[User] = userService.findUser(userId)
+      user match {
+        case Some(User(_, UserType.Dummy, _)) =>
+          Option(PasswordSettings(allowed = false, set = false))
+
+        case Some(User(_, UserType.Customer, _)) =>
+          val passwordInfo: PasswordInfo = userService.getPasswordInfo(userId)
+          Option(PasswordSettings(allowed = true, set = passwordInfo.sent || !passwordInfo.temporary))
+
+        case Some(User(_, UserType.AlmostCustomer, _)) =>
+          user.get.phone match {
+            case Some(phone) =>
+              val passwordInfo: PasswordInfo = userService.getPasswordInfo(userId)
+              productType(phone) match {
+                case 0 =>
+                  val value: Boolean = !passwordInfo.temporary || passwordInfo.sent
+                  Some(PasswordSettings(allowed = value, set = value))
+                case _ => Some(PasswordSettings(allowed = true, set = passwordInfo.sent || !passwordInfo.temporary))
+              }
+            case _ => None
+          }
+        case _ => None
+      }
     }
   }
 }
