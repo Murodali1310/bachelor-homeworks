@@ -7,4 +7,3 @@ package homework.task2
  * @param temporary  Пароль временный
  */
 case class PasswordInfo(sent: Boolean, temporary: Boolean)
-

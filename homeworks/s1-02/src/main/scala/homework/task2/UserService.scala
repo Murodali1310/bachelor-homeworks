@@ -1,3 +1,4 @@
+// UserService.scala
 package homework.task2
 
 trait UserService {
