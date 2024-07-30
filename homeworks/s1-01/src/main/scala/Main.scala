@@ -33,7 +33,6 @@ object ComplexOperation {
         case "*" => z1 * z2
       }
       println(s"$res")
-      /*println(s"res: Re = ")
       println(res.re)
       println(s"res: Im = ")
       println(res.im)*/
