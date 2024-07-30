@@ -35,7 +35,7 @@ object ComplexOperation {
       println(s"$res")
       println(res.re)
       println(s"res: Im = ")
-      println(res.im)*/
+      println(res.im)
       println("Continue ? (Y/N)")
       val choice: String = scala.io.StdIn.readLine()
       flag = choice.toUpperCase == "Y"
