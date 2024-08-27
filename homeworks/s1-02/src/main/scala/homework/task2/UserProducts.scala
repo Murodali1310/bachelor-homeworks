@@ -1,6 +1,5 @@
 package homework.task2
 
-
 sealed trait UserProducts
 
 object UserProducts {
@@ -8,4 +7,3 @@ object UserProducts {
 
   case object HeavyProducts extends UserProducts
 }
-
